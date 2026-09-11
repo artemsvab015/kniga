@@ -147,7 +147,6 @@
             background-color: var(--card); color: var(--text);
             box-sizing: border-box; font-family: inherit; margin-bottom: 8px;
         }
-        /* Корзина как модальное окно */
         .trash-modal {
             display: none;
             position: fixed;
@@ -201,7 +200,6 @@
             text-overflow: ellipsis; margin-bottom: 8px;
         }
         .trash-item-actions { display: flex; gap: 6px; }
-        /* Полноэкранный режим чтения */
         body.reading-mode .container > *:not(#editor):not(.reading-exit) {
             display: none !important;
         }
@@ -1055,45 +1053,12 @@
             alert('Заменено: ' + total + ' раз');
         };
 
-        // ============ НАПОМИНАНИЕ О СОХРАНЕНИИ ============
-        function checkBackupReminder() {
-            const lastBackup = localStorage.getItem('myBookLastBackup');
-            const now = Date.now();
-            const dayInMs = 24 * 60 * 60 * 1000;
-            if (!lastBackup || (now - parseInt(lastBackup)) > dayInMs) {
-                setTimeout(() => {
-                    let ok = true;
-                    try { ok = confirm('📖 Пора сохранить книгу!\n\nСкачать резервную копию сейчас?'); } catch (err) { ok = true; }
-                    if (ok) {
-                        downloadBackup();
-                        localStorage.setItem('myBookLastBackup', Date.now());
-                    }
-                }, 3000);
-            }
-        }
-
-        function downloadBackup() {
-            let fullText = '📖 МОЯ КНИГА — РЕЗЕРВНАЯ КОПИЯ\n' +
-                'Дата: ' + new Date().toLocaleString('ru-RU') + '\n\n';
-            chapters.forEach(ch => {
-                fullText += '=== ' + ch.title + ' ===\n\n' + ch.text + '\n\n\n';
-            });
-            const blob = new Blob([fullText], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'моя-книга-резервная-копия.txt';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
         // ============ СТАРТ ============
         loadAll();
         renderChapters();
         renderNotes();
         renderCharacters();
         updateStats();
-        checkBackupReminder();
 
         setTimeout(() => {
             if (chapters.length > 0) loadCurrentChapter();
